@@ -1,72 +1,49 @@
 #include <bits/stdc++.h>
 using namespace std;
-map<int,list<int>> mp;
-map<int,char> color;
-map<int,bool> vis;
-vector<int> v1;
-vector<int> v2;
+
+map<int, list<int>> mp;
+map<int, char> color;
+map<int, bool> vis;
 bool ans = true;
 
-void dfs(int src) {
-
+void dfs(int src, char col) {
     vis[src] = true;
-
-    for(auto nbr:mp[src]) {
-        if(!vis[nbr]) {
-            if(color[src] == 'Y')
-                color[nbr] = 'G';
-            else {
-                color[nbr] = 'Y';
-            }
-            dfs(nbr);
-        }
-        else {
-            color[nbr] = 'B';
+    for (auto nbr : mp[src]) {
+        if (!vis[nbr]) {
+            color[nbr] = (col == 'Y') ? 'G' : 'Y';
+            dfs(nbr, color[nbr]);
+        } else if (color[nbr] == col) {
             ans = false;
-            break;
+            return;
         }
     }
 }
 
 int main() {
-    
-    int n,m;
-    cin>>n>>m;
+    int n, m;
+    cin >> n >> m;
 
-    int res = 0;
-
-    for(int i=0,x,y;i<m;i++) {
-        cin>>x>>y;
+    for (int i = 0, x, y; i < m; i++) {
+        cin >> x >> y;
         mp[x].push_back(y);
+        mp[y].push_back(x);
     }
 
-    for(int i=1;i<=n;i++) {
-        color[i] = 'W';
-        vis[i] = false;
-    }
-
-    for(int i=1;i<=n;i++) {
-        if(ans) {
-            if(!vis[i]) {
-            dfs(i);
-            color[i] = 'G';
-            }
-        }  
-        
-    }
-    
-    for(auto i:color) {
-
-        if(i.second == 'B') {
-            cout<<"IMPOSSIBLE";
-            return 0;
+    for (int i = 1; i <= n; i++) {
+        if (!vis[i]) {
+            color[i] = 'Y'; // Assign initial color to first node
+            dfs(i, 'Y');
         }
-        else if(i.second == 'G') {cout<<"1"<<" ";}
-        else {cout<<"2"<<" ";}
-            
     }
 
+    if (!ans) {
+        cout << "IMPOSSIBLE";
+        return 0;
+    }
 
+    for (int i = 1; i <= n; i++) {
+        cout << ((color[i] == 'G') ? "2 " : "1 ");
+    }
 
-   
+    return 0;
 }
